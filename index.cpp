@@ -381,11 +381,28 @@ void print_data(void) {
 	total_click += 1;
 }
 
+int click = 0;
+
+void print_other_data(void) {
+	std::complex<long double> e(2.7182818284590452353602874713527, 0.0);
+	std::complex<long double> i(0, 1);
+	double pi = 3.1415926535897932384626433;
+
+	double current = 0;
+	int tot = 0;
+	current = click * 0.01;
+
+	c = std::complex<long double>(0.7885, 0) + pow(e, i * std::complex<long double>(current, 0));
+	click += 1;
+	display();
+	std::cout << current << std::endl;
+}
+
 void process_Normal_Keys(unsigned char key, int x, int y) 
 {
 	switch (key) 
 	{  
-	   case 32: print_data();break;
+	   case 32: print_other_data();break;
 	   case 97: x_offset -= x_width / 50.0;display();break;
 	   case 100: x_offset += x_width / 50.0;display();break;
 	   case 119: y_offset += y_width / 50.0;display();break;

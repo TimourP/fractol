@@ -16,8 +16,12 @@
 // using boost::multiprecision::long double;
 
 typedef GLfloat point2[2];
-const int WINDOW_HEIGHT = 1080;
-const int WINDOW_WIDTH = 2040;
+const int WINDOW_HEIGHT = 720;
+const int WINDOW_WIDTH = 960;
+
+const double width_ratio = (float)WINDOW_HEIGHT / WINDOW_WIDTH;
+
+const double WINDOW_BASE_WIDTH = 4.0;
 
 int MAX_ITERATIONS = 470;
 std::complex<long double> c(0.288, 0.01);
@@ -172,8 +176,8 @@ std::make_tuple(244, 69, 52),
 std::make_tuple(244, 67, 54)
 };
 
-long double x_width = 6.0;
-long double y_width = 3.0;
+long double x_width = WINDOW_BASE_WIDTH;
+long double y_width = WINDOW_BASE_WIDTH * width_ratio;
 
 long double x_offset = 0.0;
 long double y_offset = 0.0;
@@ -183,6 +187,24 @@ long double semi_y_width = y_width / 2.0;
 
 long double scale_x = x_width / WINDOW_WIDTH;
 long double scale_y = y_width / WINDOW_HEIGHT;
+
+// void shiftColors(void) {
+// 	std::tuple<GLubyte , GLubyte , GLubyte > last = tupleList[145];
+
+// 	for (int i = 145; i > 0; --i) {
+//         tupleList[i] = tupleList[i - 1];
+//     }
+// 	tupleList[0] = last;
+// }
+
+void shiftColors(void) {
+	std::tuple<GLubyte , GLubyte , GLubyte > last = tupleList[0];
+
+	for (int i = 0; i < 145; ++i) {
+        tupleList[i] = tupleList[i + 1];
+    }
+	tupleList[145] = last;
+}
 
 int calculateJuliaPixel(int x, int y) {
 	
@@ -229,12 +251,12 @@ bool start_display = false;
 
 void write_file(size_t i) {
 
-	int y = -1;
+	int y = WINDOW_HEIGHT;
 	
 	int max_o = 0;
 	std::thread threads[WINDOW_HEIGHT];
 
-	while (++y < WINDOW_HEIGHT)
+	while (--y >= 0)
 	{
 		threads[y] = std::thread(displayLine, y);
 	}
@@ -284,86 +306,123 @@ double solveForB(double a, double c) {
     return result;
 }
 
+// int main(void) {
+
+// 	printf("%f", width_ratio);
+
+// 	FractalPoint p1 = {1, 0, 0};
+// 	FractalPoint p2 = {0.38554328942953143607, 0.12, 0.18939779209731565849};
+// 	FractalPoint p3 = {0.0036126973096200886131, 0.11653181058276471495, 0.18636312635723478398};
+// 	FractalPoint p4 = {0.00033343750430297981389, 0.11649179808224835737, 0.18646315760852567792};
+// 	FractalPoint p5 = {1.0786431281765474626e-05, 0.11647626562120261511, 0.18646509916615639571};
+// 	FractalPoint p6 = {7.4796727416893493803e-07, 0.11647626562120261511, 0.18646509916615639571};
+// 	FractalPoint p7 = {7.0087573384359981595e-09, 0.11647626814435525695, 0.18646510168930903753};
+// 	FractalPoint p8 = {3.6514703954973760181e-10, 0.11647626823199054644, 0.1864651017112178599};
+// 	FractalPoint p10 = {3.7637337749643542181e-12, 0.11647626823265180435, 0.1864651017094323809};
+// 	FractalPoint p11 = {3.5267715080864473832e-14, 0.11647626823263064371, 0.18646510170964339247};
+// 	FractalPoint p12 = {5.8545276544196296107e-16, 0.11647626823263099499, 0.18646510170964349786};
+// 	FractalPoint p13 = {3.4063311277527493124e-18, 0.11647626823263099499, 0.18646510170964349786};
+
+// 	std::vector<FractalPoint> road;
+// 	road.push_back(p1);
+// 	road.push_back(p2);
+// 	road.push_back(p3);
+// 	road.push_back(p4);
+// 	road.push_back(p5);
+// 	road.push_back(p6);
+// 	road.push_back(p7);
+// 	road.push_back(p8);
+// 	road.push_back(p10);
+// 	road.push_back(p11);
+// 	road.push_back(p12);
+// 	road.push_back(p13);
+
+// 	double current_value = p1.mult;
+// 	double current_offset_x = p1.offset_x;
+// 	double current_offset_y = p1.offset_y;
+
+// 	int tot = 0;
+
+// 	write_file(tot);
+
+// 	for (size_t i = 0; i < road.size() - 1; i++)
+// 	{
+// 		double from = current_value;
+// 		FractalPoint to = road[i + 1];
+
+// 		double from_offset_x = current_offset_x;
+// 		double to_offset_x = to.offset_x;
+
+// 		double from_offset_y = current_offset_y;
+// 		double to_offset_y = to.offset_y;
+
+// 		int step = solveForB(from, to.mult);
+
+// 		double to_add_x = (to_offset_x - from_offset_x) / step;
+// 		double to_add_y = (to_offset_y - from_offset_y) / step;
+
+// 		for (size_t j = 0; j < step; j++)
+// 		{
+// 			current_value *= 0.99;
+// 			current_offset_x += to_add_x;
+// 			current_offset_y += to_add_y;
+
+// 			y_width = current_value * WINDOW_BASE_WIDTH * width_ratio;
+// 			x_width = current_value * WINDOW_BASE_WIDTH;
+
+// 			semi_x_width = x_width / 2.0;
+// 			semi_y_width = y_width / 2.0;
+
+// 			scale_x = x_width / WINDOW_WIDTH;
+// 			scale_y = y_width / WINDOW_HEIGHT;
+
+// 			x_offset = current_offset_x;
+// 			y_offset = current_offset_y;
+
+// 			write_file(tot);
+
+// 			if (tot % 3 <= 1)
+// 				shiftColors();
+
+
+// 			tot++;
+// 		}
+
+// 		if (tot > 200) {
+// 			return 0;
+// 		}
+// 	}
+
+
+//     return 0;
+// }
+
+
 int main(void) {
+	std::complex<long double> e(2.7182818284590452353602874713527, 0.0);
+	std::complex<long double> i(0, 1);
+	double pi = 3.1415926535897932384626433;
 
-	FractalPoint p1 = {1, 0, 0};
-	FractalPoint p2 = {0.38554328942953143607, 0.12, 0.18939779209731565849};
-	FractalPoint p3 = {0.0036126973096200886131, 0.11653181058276471495, 0.18636312635723478398};
-	FractalPoint p4 = {0.00033343750430297981389, 0.11649179808224835737, 0.18646315760852567792};
-	FractalPoint p5 = {1.0786431281765474626e-05, 0.11647626562120261511, 0.18646509916615639571};
-	FractalPoint p6 = {7.4796727416893493803e-07, 0.11647626562120261511, 0.18646509916615639571};
-	FractalPoint p7 = {7.0087573384359981595e-09, 0.11647626814435525695, 0.18646510168930903753};
-	FractalPoint p8 = {3.6514703954973760181e-10, 0.11647626823199054644, 0.1864651017112178599};
-	FractalPoint p10 = {3.7637337749643542181e-12, 0.11647626823265180435, 0.1864651017094323809};
-	FractalPoint p11 = {3.5267715080864473832e-14, 0.11647626823263064371, 0.18646510170964339247};
-	FractalPoint p12 = {5.8545276544196296107e-16, 0.11647626823263099499, 0.18646510170964349786};
-	FractalPoint p13 = {3.4063311277527493124e-18, 0.11647626823263099499, 0.18646510170964349786};
-
-	std::vector<FractalPoint> road;
-	road.push_back(p1);
-	road.push_back(p2);
-	road.push_back(p3);
-	road.push_back(p4);
-	road.push_back(p5);
-	road.push_back(p6);
-	road.push_back(p7);
-	road.push_back(p8);
-	road.push_back(p10);
-	road.push_back(p11);
-	road.push_back(p12);
-	road.push_back(p13);
-
-	double current_value = p1.mult;
-	double current_offset_x = p1.offset_x;
-	double current_offset_y = p1.offset_y;
-
+	double current = 0;
 	int tot = 0;
-
-	write_file(tot);
-
-	for (size_t i = 0; i < road.size() - 1; i++)
+	while (current < 2 * pi)
 	{
-		double from = current_value;
-		FractalPoint to = road[i + 1];
-
-		double from_offset_x = current_offset_x;
-		double to_offset_x = to.offset_x;
-
-		double from_offset_y = current_offset_y;
-		double to_offset_y = to.offset_y;
-
-		int step = solveForB(from, to.mult);
-
-		double to_add_x = (to_offset_x - from_offset_x) / step;
-		double to_add_y = (to_offset_y - from_offset_y) / step;
-
-		for (size_t j = 0; j < step; j++)
-		{
-			current_value *= 0.99;
-			current_offset_x += to_add_x;
-			current_offset_y += to_add_y;
-
-			y_width = current_value * 3.0;
-			x_width = current_value * 6.0;
-
-			semi_x_width = x_width / 2.0;
-			semi_y_width = y_width / 2.0;
-
-			scale_x = x_width / WINDOW_WIDTH;
-			scale_y = y_width / WINDOW_HEIGHT;
-
-			x_offset = current_offset_x;
-			y_offset = current_offset_y;
-
-			write_file(tot);
-			tot++;
+		if (current > 2.35 && current < 2.45) {
+			current += 0.015 / (100 - (2.45 - current) * 1000);
+		} else if (current > 3.83 && current < 3.93) {
+			double div = (3.93 - current) * 1000;
+			if (div < 1) {
+				div = 1;
+			}
+			current += 0.015 / div;
+		} else {
+			current += 0.015;
 		}
 
-		if (tot > 200) {
-			return 0;
-		}
+		c = std::complex<long double>(0.7885, 0) + pow(e, i * std::complex<long double>(current, 0));
+		write_file(tot);
+		tot += 1;
 	}
-
-
-    return 0;
+	
+	return 0;
 }
